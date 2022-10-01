@@ -10,6 +10,27 @@ import { useState } from "react";
 const RegistrationForm = () => {
   const [sex, setSex] = useState("Select your Sex");
   const [checked, setChecked] = useState(false);
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [phonenumber, setPhonenumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+
+  const handleTextName = (e) => {
+    setName(e.target.value);
+  };
+  const handleTextSurname = (e) => {
+    setSurname(e.target.value);
+  };
+  const handleTextPhonenumber = (e) => {
+    setPhonenumber(e.target.value);
+  };
+  const handleTextEmail = (e) => {
+    setEmail(e.target.value);
+  };
+  const handleTextAddress = (e) => {
+    setAddress(e.target.value);
+  };
 
   const handleCheckBox = (e) => {
     setChecked(e.target.checked);
@@ -19,6 +40,16 @@ const RegistrationForm = () => {
     setSex(e.target.value);
   };
 
+  const handleOnClick = (e) => {
+    console.log(`checked is ${checked}`);
+    console.log(sex);
+    console.log(name);
+    console.log(surname);
+    console.log(phonenumber);
+    console.log(email);
+    console.log(address);
+  };
+
   return (
     <div className="registration-form center">
       <Typography variant="h4" component="div">
@@ -26,6 +57,8 @@ const RegistrationForm = () => {
       </Typography>
       <form>
         <TextField
+          value={name}
+          onChange={handleTextName}
           label="Name"
           margin="normal"
           InputLabelProps={{
@@ -34,6 +67,8 @@ const RegistrationForm = () => {
           fullWidth={true}
         />
         <TextField
+          value={surname}
+          onChange={handleTextSurname}
           label="Surname"
           margin="normal"
           InputLabelProps={{
@@ -42,6 +77,8 @@ const RegistrationForm = () => {
           fullWidth={true}
         />
         <TextField
+          value={phonenumber}
+          onChange={handleTextPhonenumber}
           label="PhoneNumber"
           margin="normal"
           InputLabelProps={{
@@ -50,6 +87,8 @@ const RegistrationForm = () => {
           fullWidth={true}
         />
         <TextField
+          value={email}
+          onChange={handleTextEmail}
           label="Email"
           margin="normal"
           InputLabelProps={{
@@ -72,6 +111,8 @@ const RegistrationForm = () => {
         </Select>
 
         <TextField
+          value={address}
+          onChange={handleTextAddress}
           label="Address"
           margin="normal"
           InputLabelProps={{
@@ -94,6 +135,7 @@ const RegistrationForm = () => {
           InputLabelProps={{
             className: "text-field",
           }}
+          onClick={handleOnClick}
         >
           Register
         </Button>
