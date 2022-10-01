@@ -3,11 +3,24 @@ import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import "./registration.form.css";
+import { useState } from "react";
 
 const RegistrationForm = () => {
+  const [sex, setSex] = useState("Select your Sex");
+  const [checked, setChecked] = useState(false);
+
+  const handleCheckBox = (e) => {
+    setChecked(e.target.checked);
+  };
+
+  const handleSelect = (e) => {
+    setSex(e.target.value);
+  };
+
   return (
-    <div className="registration-form">
+    <div className="registration-form center">
       <Typography variant="h4" component="div">
         Registration form
       </Typography>
@@ -46,14 +59,16 @@ const RegistrationForm = () => {
         />
         <Select
           label="Choose your sex"
+          value={sex}
           displayEmpty
-          InputLabelProps={{
-            className: "text-field",
-          }}
+          onChange={handleSelect}
           fullWidth={true}
         >
-          <MenuItem value={10}>Male</MenuItem>
-          <MenuItem value={20}>Female</MenuItem>
+          <MenuItem value={"Select your Sex"} disabled>
+            <em>select the value</em>
+          </MenuItem>
+          <MenuItem value={"Male"}>Male</MenuItem>
+          <MenuItem value={"Female"}>Female</MenuItem>
         </Select>
 
         <TextField
@@ -64,9 +79,15 @@ const RegistrationForm = () => {
           }}
           fullWidth={true}
         />
-        <Checkbox
+        <FormControlLabel
+          control={
+            <Checkbox
+              color="success"
+              checked={checked}
+              onChange={handleCheckBox}
+            />
+          }
           label="Do you agree with using your personal data "
-          color="success"
         />
         <Button
           fullWidth={true}

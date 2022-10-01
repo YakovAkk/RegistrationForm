@@ -1,15 +1,15 @@
 .registration-form {
-  width: 50vw;
+  width: 40vw;
   height: 100vh;
   background: white;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-self: center;
-  text-align: center;
+}
+
+.center {
+  margin: auto;
+  margin-top: 5vw;
 }
 
 .text-field {
-  color: black !important;
+  color: white !important;
 }
