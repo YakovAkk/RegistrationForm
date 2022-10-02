@@ -8,6 +8,8 @@ import FormHelperText from "@mui/material/FormHelperText";
 import FormControl from "@mui/material/FormControl";
 import "./registration.form.css";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { ADD_USER, REMOVE_USER } from "../..";
 
 const RegistrationForm = () => {
   const [sex, setSex] = useState("Select your Sex");
@@ -56,37 +58,75 @@ const RegistrationForm = () => {
     }
   };
 
-  const handleOnClick = (e) => {
-    setErrorSurname("");
-    setErrorName("");
-    setErrorPhonenumber("");
-    setErrorEmail("");
-    setErrorAddress("");
-    setErrorSex("");
-    setErrorChecked("");
+  const zeroingvaliables = () => {
+    setSex("Select your Sex");
+    setName("");
+    setSurname("");
+    setChecked(false);
+    setPhonenumber("");
+    setEmail("");
+    setAddress("");
+  };
+
+  const validate = () => {
+    let flag = true;
+    zeroingvaliables();
     if (!checked) {
       setErrorChecked("The field is required!");
+      flag = false;
     }
     if (sex === "Select your Sex") {
       setErrorSex("You have to choose you sex!");
+      flag = false;
     }
     if (!name) {
       setErrorName("Name can't be empty!");
+      flag = false;
     }
     if (!surname) {
       setErrorSurname("Surname can't be empty!");
+      flag = false;
     }
     if (!phonenumber || phonenumber.length < 10) {
       setErrorPhonenumber(
         "Phonenumber can't be empty of less than ten symbols!"
       );
+      flag = false;
     }
     if (!email || !email.includes(".") || !email.includes("@")) {
       setErrorEmail("The email isn't valid!");
+      flag = false;
     }
     if (!address) {
       setErrorAddress("Address can't be empty!");
+      flag = false;
     }
+
+    return flag;
+  };
+
+  const handleOnClick = (e) => {
+    if (validate()) {
+      const user = {
+        name: name,
+        surname: surname,
+        sex: sex,
+        email: email,
+        address: address,
+      };
+      adduser(user);
+      zeroingvaliables();
+    }
+  };
+
+  const dispatch = useDispatch();
+
+  const adduser = (user) => {
+    dispatch({ type: ADD_USER, payload: user });
+  };
+
+  const removeuser = (user) => {
+    dispatch({ type: REMOVE_USER, payload: user });
   };
 
   return (

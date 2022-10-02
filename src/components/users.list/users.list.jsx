@@ -1,21 +1,18 @@
+import { useSelector } from "react-redux";
 import User from "../user/user.jsx";
-
+import "./users.list.css";
 const UsersList = () => {
-  const person = {
-    name: "A",
-    surname: "a",
-    sex: "Male",
-    email: "QQQ@gmail.com",
-    address: "A",
-  };
+  const users = useSelector((state) => state.users);
 
-  const people = [person, person];
+  //const people = [];
 
   return (
     <div>
-      {people.map((person) => (
-        <User person={person}></User>
-      ))}
+      {users.length == 0 ? (
+        <p className="nousers">there is no registered users</p>
+      ) : (
+        users.map((user) => <User person={user}></User>)
+      )}
     </div>
   );
 };
