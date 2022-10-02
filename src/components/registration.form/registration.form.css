@@ -1,13 +1,12 @@
 .registration-form {
-  width: 40vw;
-  height: 100vh;
+  width: 40%;
+  height: 90%;
   background: white;
   padding: 20px;
 }
 
 .center {
   margin: auto;
-  margin-top: 5vw;
 }
 
 .text-field {

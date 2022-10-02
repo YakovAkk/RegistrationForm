@@ -1,0 +1,9 @@
+.storage-user {
+  border: 3px solid red;
+  padding: 10px;
+}
+
+.storage-user p {
+  font-size: 20px;
+  color: white;
+}
