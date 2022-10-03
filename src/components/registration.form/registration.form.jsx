@@ -9,7 +9,7 @@ import FormControl from "@mui/material/FormControl";
 import "./registration.form.css";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ADD_USER, REMOVE_USER } from "../..";
+import { ADD_USER, REMOVE_USER } from "../../redux/action.types";
 
 const RegistrationForm = () => {
   const [sex, setSex] = useState("Select your Sex");
@@ -68,9 +68,19 @@ const RegistrationForm = () => {
     setAddress("");
   };
 
+  const zeroingerrors = () => {
+    setErrorSex("");
+    setErrorName("");
+    setErrorSurname("");
+    setErrorChecked(false);
+    setErrorPhonenumber("");
+    setErrorEmail("");
+    setErrorAddress("");
+  };
+
   const validate = () => {
     let flag = true;
-    zeroingvaliables();
+    zeroingerrors();
     if (!checked) {
       setErrorChecked("The field is required!");
       flag = false;
@@ -106,6 +116,12 @@ const RegistrationForm = () => {
   };
 
   const handleOnClick = (e) => {
+    console.log(name);
+    console.log(surname);
+    console.log(sex);
+    console.log(email);
+    console.log(address);
+
     if (validate()) {
       const user = {
         name: name,
