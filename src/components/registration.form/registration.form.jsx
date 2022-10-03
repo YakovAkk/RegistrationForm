@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Button, Typography } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
@@ -12,6 +13,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { actionTypes } from "../../redux/actions/action.types";
 import { types } from "../../redux/actions/types";
 import { AddUser, formContainer } from "./registration.form.container";
+import CircularProgress from "@mui/material/CircularProgress";
+import Autocomplete from "@mui/material/Autocomplete";
+
+function sleep(delay = 0) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, delay);
+  });
+}
 
 const RegistrationForm = () => {
   const [sex, setSex] = useState("Select your Sex");
@@ -29,7 +38,64 @@ const RegistrationForm = () => {
   const [address, setAddress] = useState("");
   const [errorAddress, setErrorAddress] = useState("");
 
-  const handleChangeValueOfField = (e) => {
+  const dispatch = useDispatch();
+
+  const container = formContainer(dispatch);
+
+  const addresses = useSelector((state) => state.addressReducer.address);
+
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState([]);
+  const loading = open && options.length === 0;
+
+  const getAddressesAsync = async (mess) => {
+    const url = `https://autocomplete.search.hereapi.com/v1/autocomplete?q=${mess}&apiKey=${localStorage.getItem(
+      "key"
+    )}
+    `;
+    fetch(url)
+      .then((response) => response.json())
+      .then((json) =>
+        json.items.forEach((elem) => {
+          //container.AddAddresses([{ title: elem.address.label }]);
+          setOptions([...options, { title: elem.address.label }]);
+          console.log(elem);
+          console.log(options);
+        })
+      );
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    if (!loading) {
+      return undefined;
+    }
+
+    if (address) {
+      (async () => {
+        //await getAddresses(address); // For demo purposes.
+
+        if (active) {
+          setOptions([...options, addresses]);
+        }
+      })();
+    }
+
+    setOptions([...countries]);
+
+    return () => {
+      active = false;
+    };
+  }, [loading]);
+
+  useEffect(() => {
+    if (!open) {
+      setOptions([]);
+    }
+  }, [open]);
+
+  const handleChangeValueOfField = async (e) => {
     switch (e.target.name) {
       case "sexselect":
         setSex(e.target.value);
@@ -53,7 +119,11 @@ const RegistrationForm = () => {
         setEmail(e.target.value);
         break;
       case "address":
+        //console.log(e.target.value);
         setAddress(e.target.value);
+        // // setOptions([...options, addresses]);
+        await getAddressesAsync(e.target.value);
+
         break;
       default:
         break;
@@ -134,24 +204,20 @@ const RegistrationForm = () => {
       adduser(user);
       zeroingvaliables();
     }
-    // const url = `
-    // https://autocomplete.search.hereapi.com/v1/
-    // autocomplete
-    // ?q=uk
-    // &apiKey=${localStorage.getItem("key")}
-    // `;
-    // fetch(url)
-    //   .then((response) => response.json())
-    //   .then((json) => console.log(json));
   };
-
-  const dispatch = useDispatch();
-
-  const container = formContainer(dispatch);
 
   const adduser = (user) => {
     container.AddUser(user);
   };
+
+  const countries = [
+    { title: "England" },
+    { title: "UnitedKindom" },
+    { title: "Afghanistan" },
+    { title: "Albania" },
+    { title: "Algeria" },
+    { title: "Andorra" },
+  ];
 
   return (
     <div className="registration-form center">
@@ -216,7 +282,6 @@ const RegistrationForm = () => {
           }}
           fullWidth={true}
         />
-
         <FormControl sx={{ marginTop: 1 }} fullWidth={true} error={errorSex}>
           <Select
             helperText={"AAAAAA"}
@@ -247,6 +312,48 @@ const RegistrationForm = () => {
           }}
           fullWidth={true}
         />
+        {/* <Autocomplete
+          fullWidth={true}
+          open={open}
+          onOpen={() => {
+            setOpen(true);
+          }}
+          onClose={() => {
+            setOpen(false);
+          }}
+          isOptionEqualToValue={(option, value) => option.title === value.title}
+          getOptionLabel={(option) => option.title}
+          options={options}
+          loading={loading}
+          renderInput={(params) => (
+            <TextField
+              InputLabelProps={{
+                className: "text-field",
+              }}
+              error={errorAddress}
+              helperText={errorAddress}
+              required
+              name="address"
+              value={address}
+              onChange={handleChangeValueOfField}
+              label="Address"
+              margin="normal"
+              {...params}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <React.Fragment>
+                    {loading ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
+                    {params.InputProps.endAdornment}
+                  </React.Fragment>
+                ),
+              }}
+            />
+          )}
+        /> */}
+
         <FormControl error={errorChecked}>
           <FormControlLabel
             control={
