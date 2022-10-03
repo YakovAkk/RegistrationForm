@@ -1,4 +1,4 @@
-import { ADD_SUGGESTIONS_ADDRSSES } from "../actions/action.types";
+import { types } from "../actions/types";
 
 const defaultState = {
   addresses: [],
@@ -6,7 +6,7 @@ const defaultState = {
 
 export const AddressReducer = (state = defaultState, action) => {
   switch (action.type) {
-    case ADD_SUGGESTIONS_ADDRSSES:
+    case types.ADD_SUGGESTIONS_ADDRSSES:
       return { ...state, addresses: [action.payload] };
     default:
       return state;

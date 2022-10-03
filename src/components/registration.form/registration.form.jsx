@@ -7,9 +7,11 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
 import FormControl from "@mui/material/FormControl";
 import "./registration.form.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ADD_USER, REMOVE_USER } from "../../redux/actions/action.types";
+import { actionTypes } from "../../redux/actions/action.types";
+import { types } from "../../redux/actions/types";
+import { AddUser, formContainer } from "./registration.form.container";
 
 const RegistrationForm = () => {
   const [sex, setSex] = useState("Select your Sex");
@@ -116,12 +118,11 @@ const RegistrationForm = () => {
   };
 
   const handleOnClick = (e) => {
-    console.log(name);
-    console.log(surname);
-    console.log(sex);
-    console.log(email);
-    console.log(address);
-
+    // console.log(name);
+    // console.log(surname);
+    // console.log(sex);
+    // console.log(email);
+    // console.log(address);
     if (validate()) {
       const user = {
         name: name,
@@ -133,16 +134,23 @@ const RegistrationForm = () => {
       adduser(user);
       zeroingvaliables();
     }
+    // const url = `
+    // https://autocomplete.search.hereapi.com/v1/
+    // autocomplete
+    // ?q=uk
+    // &apiKey=${localStorage.getItem("key")}
+    // `;
+    // fetch(url)
+    //   .then((response) => response.json())
+    //   .then((json) => console.log(json));
   };
 
   const dispatch = useDispatch();
 
-  const adduser = (user) => {
-    dispatch({ type: ADD_USER, payload: user });
-  };
+  const container = formContainer(dispatch);
 
-  const removeuser = (user) => {
-    dispatch({ type: REMOVE_USER, payload: user });
+  const adduser = (user) => {
+    container.AddUser(user);
   };
 
   return (
