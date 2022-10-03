@@ -1,4 +1,4 @@
-import { ADD_SUGGESTIONS_ADDRSSES } from "./action.types";
+import { ADD_SUGGESTIONS_ADDRSSES } from "../actions/action.types";
 
 const defaultState = {
   addresses: [],

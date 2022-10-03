@@ -9,7 +9,7 @@ import FormControl from "@mui/material/FormControl";
 import "./registration.form.css";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ADD_USER, REMOVE_USER } from "../../redux/action.types";
+import { ADD_USER, REMOVE_USER } from "../../redux/actions/action.types";
 
 const RegistrationForm = () => {
   const [sex, setSex] = useState("Select your Sex");
