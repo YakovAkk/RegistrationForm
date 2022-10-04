@@ -37,6 +37,7 @@ const RegistrationForm = () => {
   const [errorEmail, setErrorEmail] = useState("");
   const [address, setAddress] = useState("");
   const [errorAddress, setErrorAddress] = useState("");
+  const [autocompleteAddress, setAutocompleteAddress] = useState("");
 
   const dispatch = useDispatch();
 
@@ -48,23 +49,23 @@ const RegistrationForm = () => {
   const [options, setOptions] = useState([]);
   const loading = open && options.length === 0;
 
+  const change = (title) => {
+    return { title: title };
+  };
   const getAddressesAsync = async (mess) => {
     const url = `https://autocomplete.search.hereapi.com/v1/autocomplete?q=${mess}&apiKey=${localStorage.getItem(
       "key"
     )}
     `;
-    fetch(url)
+    const url2 = `https://jsonplaceholder.typicode.com/todos`;
+    fetch(url2)
       .then((response) => response.json())
-      .then((json) =>
-        json.items.forEach((elem) => {
-          //container.AddAddresses([{ title: elem.address.label }]);
-          setOptions([...options, { title: elem.address.label }]);
-          console.log(elem);
-          console.log(options);
-        })
-      );
+      .then((json) => {
+        setOptions(json.map((i) => change(i.title)));
+        //console.log(options);
+      });
   };
-
+  //
   useEffect(() => {
     let active = true;
 
@@ -74,11 +75,10 @@ const RegistrationForm = () => {
 
     if (address) {
       (async () => {
-        //await getAddresses(address); // For demo purposes.
-
-        if (active) {
-          setOptions([...options, addresses]);
-        }
+        await getAddressesAsync(address);
+        // if (active) {
+        //   setOptions([...options, addresses]);
+        // }
       })();
     }
 
@@ -119,12 +119,14 @@ const RegistrationForm = () => {
         setEmail(e.target.value);
         break;
       case "address":
-        //console.log(e.target.value);
         setAddress(e.target.value);
-        // // setOptions([...options, addresses]);
         await getAddressesAsync(e.target.value);
-
         break;
+      // case "adressAutocompleter":
+      //   setAutocompleteAddress(v);
+      //   console.log(autocompleteAddress);
+      //   console.log("autocompleteAddress");
+      //   break;
       default:
         break;
     }
@@ -138,6 +140,8 @@ const RegistrationForm = () => {
     setPhonenumber("");
     setEmail("");
     setAddress("");
+    setAutocompleteAddress("");
+    setOpen(false);
   };
 
   const zeroingerrors = () => {
@@ -179,7 +183,7 @@ const RegistrationForm = () => {
       setErrorEmail("The email isn't valid!");
       flag = false;
     }
-    if (!address) {
+    if (!address && !autocompleteAddress) {
       setErrorAddress("Address can't be empty!");
       flag = false;
     }
@@ -193,21 +197,18 @@ const RegistrationForm = () => {
     // console.log(sex);
     // console.log(email);
     // console.log(address);
+    // console.log(autocompleteAddress);
     if (validate()) {
       const user = {
         name: name,
         surname: surname,
         sex: sex,
         email: email,
-        address: address,
+        address: autocompleteAddress ? autocompleteAddress : address,
       };
-      adduser(user);
+      container.AddUser(user);
       zeroingvaliables();
     }
-  };
-
-  const adduser = (user) => {
-    container.AddUser(user);
   };
 
   const countries = [
@@ -298,7 +299,7 @@ const RegistrationForm = () => {
           </Select>
           <FormHelperText>{errorSex}</FormHelperText>
         </FormControl>
-        <TextField
+        {/* <TextField
           error={errorAddress}
           helperText={errorAddress}
           required
@@ -311,8 +312,10 @@ const RegistrationForm = () => {
             className: "text-field",
           }}
           fullWidth={true}
-        />
-        {/* <Autocomplete
+        /> */}
+        <Autocomplete
+          name="adressAutocompleter"
+          onChange={(e, v) => setAutocompleteAddress(v?.title)}
           fullWidth={true}
           open={open}
           onOpen={() => {
@@ -327,6 +330,7 @@ const RegistrationForm = () => {
           loading={loading}
           renderInput={(params) => (
             <TextField
+              onChange={handleChangeValueOfField}
               InputLabelProps={{
                 className: "text-field",
               }}
@@ -335,7 +339,6 @@ const RegistrationForm = () => {
               required
               name="address"
               value={address}
-              onChange={handleChangeValueOfField}
               label="Address"
               margin="normal"
               {...params}
@@ -352,7 +355,7 @@ const RegistrationForm = () => {
               }}
             />
           )}
-        /> */}
+        />
 
         <FormControl error={errorChecked}>
           <FormControlLabel
