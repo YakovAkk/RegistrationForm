@@ -1,7 +1,7 @@
 .registration-form {
-  width: 40%;
-  height: 90%;
-  background: white;
+  max-width: 600px;
+
+  background: rgb(230, 230, 165);
   padding: 20px;
 }
 
@@ -10,5 +10,5 @@
 }
 
 .text-field {
-  color: white !important;
+  color: rgb(41, 28, 28) !important;
 }

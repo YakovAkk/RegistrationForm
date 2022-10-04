@@ -1,5 +1,9 @@
-.nousers {
+.no-users {
   color: red;
   font-size: 30px;
   text-align: center;
+}
+
+.user-list {
+  background: black;
 }

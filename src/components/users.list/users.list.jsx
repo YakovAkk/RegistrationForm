@@ -6,9 +6,9 @@ const UsersList = () => {
   const users = useSelector((state) => state.userResucer.users);
 
   return (
-    <div>
+    <div className="user-list">
       {users.length == 0 ? (
-        <p className="nousers">there is no registered users</p>
+        <p className="no-users">there is no registered users</p>
       ) : (
         users.map((user) => <User person={user}></User>)
       )}

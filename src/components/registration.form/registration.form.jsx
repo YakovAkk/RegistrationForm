@@ -8,7 +8,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
 import FormControl from "@mui/material/FormControl";
 import "./registration.form.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actionTypes } from "../../redux/actions/action.types";
 import { types } from "../../redux/actions/types";
@@ -16,38 +16,40 @@ import { AddUser, formContainer } from "./registration.form.container";
 import CircularProgress from "@mui/material/CircularProgress";
 import Autocomplete from "@mui/material/Autocomplete";
 
-function sleep(delay = 0) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay);
-  });
-}
-
 const RegistrationForm = () => {
-  const [sex, setSex] = useState("Select your Sex");
-  const [errorSex, setErrorSex] = useState("");
-  const [checked, setChecked] = useState(false);
-  const [errorChecked, setErrorChecked] = useState("");
-  const [name, setName] = useState("");
-  const [errorName, setErrorName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [errorSurname, setErrorSurname] = useState("");
-  const [phonenumber, setPhonenumber] = useState("");
-  const [errorPhonenumber, setErrorPhonenumber] = useState("");
-  const [email, setEmail] = useState("");
-  const [errorEmail, setErrorEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [errorAddress, setErrorAddress] = useState("");
-  const [autocompleteAddress, setAutocompleteAddress] = useState("");
+  const [beenSubmitted, setBeenSubmitted] = useState(false);
+  const [form, setForm] = useState({});
+  const [error, setError] = useState({});
 
   const dispatch = useDispatch();
 
   const container = formContainer(dispatch);
 
-  const addresses = useSelector((state) => state.addressReducer.address);
-
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   const loading = open && options.length === 0;
+
+  const handleInput = (event) => {
+    const { target } = event;
+
+    const value = target.type === "checkbox" ? target.checked : target.value;
+
+    if (target.name == "phonenumber") {
+      const onlyNums = value.replace(/[^0-9]/g, "");
+
+      if (onlyNums.length < 11) {
+        setForm((prevForm) => ({
+          ...prevForm,
+          [target.name]: onlyNums,
+        }));
+      }
+      return;
+    }
+    setForm((prevForm) => ({
+      ...prevForm,
+      [target.name]: value,
+    }));
+  };
 
   const change = (title) => {
     return { title: title };
@@ -62,10 +64,9 @@ const RegistrationForm = () => {
       .then((response) => response.json())
       .then((json) => {
         setOptions(json.map((i) => change(i.title)));
-        //console.log(options);
       });
   };
-  //
+
   useEffect(() => {
     let active = true;
 
@@ -73,12 +74,9 @@ const RegistrationForm = () => {
       return undefined;
     }
 
-    if (address) {
+    if (form.address) {
       (async () => {
-        await getAddressesAsync(address);
-        // if (active) {
-        //   setOptions([...options, addresses]);
-        // }
+        await getAddressesAsync(form.address);
       })();
     }
 
@@ -95,119 +93,63 @@ const RegistrationForm = () => {
     }
   }, [open]);
 
-  const handleChangeValueOfField = async (e) => {
-    switch (e.target.name) {
-      case "sexselect":
-        setSex(e.target.value);
-        break;
-      case "agreecheckbox":
-        setChecked(e.target.checked);
-        break;
-      case "name":
-        setName(e.target.value);
-        break;
-      case "surname":
-        setSurname(e.target.value);
-        break;
-      case "phonenumber":
-        const value = e.target.value.replace(/\D/, "");
-        if (value.length < 11) {
-          setPhonenumber(value);
-        }
-        break;
-      case "email":
-        setEmail(e.target.value);
-        break;
-      case "address":
-        setAddress(e.target.value);
-        await getAddressesAsync(e.target.value);
-        break;
-      // case "adressAutocompleter":
-      //   setAutocompleteAddress(v);
-      //   console.log(autocompleteAddress);
-      //   console.log("autocompleteAddress");
-      //   break;
-      default:
-        break;
-    }
-  };
-
   const zeroingvaliables = () => {
-    setSex("Select your Sex");
-    setName("");
-    setSurname("");
-    setChecked(false);
-    setPhonenumber("");
-    setEmail("");
-    setAddress("");
-    setAutocompleteAddress("");
-    setOpen(false);
+    setForm({});
   };
 
   const zeroingerrors = () => {
-    setErrorSex("");
-    setErrorName("");
-    setErrorSurname("");
-    setErrorChecked(false);
-    setErrorPhonenumber("");
-    setErrorEmail("");
-    setErrorAddress("");
+    setError({});
   };
 
   const validate = () => {
-    let flag = true;
+    const allErrors = {};
     zeroingerrors();
-    if (!checked) {
-      setErrorChecked("The field is required!");
-      flag = false;
+    if (!form.agreecheckbox) {
+      allErrors.agreecheckbox = "The field is required!";
     }
-    if (sex === "Select your Sex") {
-      setErrorSex("You have to choose you sex!");
-      flag = false;
+    if (!form.sexselect) {
+      allErrors.sexselect = "You have to choose you sex!";
     }
-    if (!name) {
-      setErrorName("Name can't be empty!");
-      flag = false;
+    if (!form.name) {
+      allErrors.name = "Name can't be empty!";
     }
-    if (!surname) {
-      setErrorSurname("Surname can't be empty!");
-      flag = false;
+    if (!form.surname) {
+      allErrors.surname = "Surname can't be empty!";
     }
-    if (!phonenumber || phonenumber.length < 10) {
-      setErrorPhonenumber(
-        "Phonenumber can't be empty of less than ten symbols!"
-      );
-      flag = false;
+    if (!form.phonenumber || form.phonenumber.length < 10) {
+      allErrors.phonenumber =
+        "Phonenumber can't be empty of less than ten symbols!";
     }
-    if (!email || !email.includes(".") || !email.includes("@")) {
-      setErrorEmail("The email isn't valid!");
-      flag = false;
+    if (!form.email || !form.email.includes(".") || !form.email.includes("@")) {
+      allErrors.email = "The email isn't valid!";
     }
-    if (!address && !autocompleteAddress) {
-      setErrorAddress("Address can't be empty!");
-      flag = false;
+    if (!form.address) {
+      allErrors.address = "Address can't be empty!";
     }
 
-    return flag;
+    setError(allErrors);
   };
 
-  const handleOnClick = (e) => {
-    // console.log(name);
-    // console.log(surname);
-    // console.log(sex);
-    // console.log(email);
-    // console.log(address);
-    // console.log(autocompleteAddress);
-    if (validate()) {
+  useEffect(() => {
+    validate();
+  }, [form]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setBeenSubmitted(true);
+
+    if (Object.keys(error).length === 0) {
       const user = {
-        name: name,
-        surname: surname,
-        sex: sex,
-        email: email,
-        address: autocompleteAddress ? autocompleteAddress : address,
+        name: form.name,
+        surname: form.surname,
+        sex: form.sexselect,
+        email: form.email,
+        address: form.address,
       };
       container.AddUser(user);
       zeroingvaliables();
+      setBeenSubmitted(false);
     }
   };
 
@@ -220,19 +162,21 @@ const RegistrationForm = () => {
     { title: "Andorra" },
   ];
 
+  const ref0 = useRef();
+
   return (
     <div className="registration-form center">
-      <Typography variant="h4" component="div">
+      <Typography variant="h4" component="div" className="text-field">
         Registration form
       </Typography>
-      <form>
+      <form onSubmit={handleSubmit} noValidate>
         <TextField
-          error={errorName}
-          helperText={errorName}
+          error={beenSubmitted ? error.name : null}
+          helperText={beenSubmitted ? error.name : null}
           required
           name="name"
-          value={name}
-          onChange={handleChangeValueOfField}
+          value={form.name || ""}
+          onChange={handleInput}
           label="Name"
           margin="normal"
           InputLabelProps={{
@@ -241,12 +185,12 @@ const RegistrationForm = () => {
           fullWidth={true}
         />
         <TextField
-          error={errorSurname}
-          helperText={errorSurname}
+          error={beenSubmitted ? error.surname : null}
+          helperText={beenSubmitted ? error.surname : null}
           required
           name="surname"
-          value={surname}
-          onChange={handleChangeValueOfField}
+          value={form.surname || ""}
+          onChange={handleInput}
           label="Surname"
           margin="normal"
           InputLabelProps={{
@@ -255,27 +199,26 @@ const RegistrationForm = () => {
           fullWidth={true}
         />
         <TextField
-          error={errorPhonenumber}
-          helperText={errorPhonenumber}
+          error={beenSubmitted ? error.phonenumber : null}
+          helperText={beenSubmitted ? error.phonenumber : null}
           required
           name="phonenumber"
-          value={phonenumber}
-          onChange={handleChangeValueOfField}
+          value={form.phonenumber || ""}
+          onChange={handleInput}
           label="PhoneNumber"
           margin="normal"
-          pattern="[0-9]*"
           InputLabelProps={{
             className: "text-field",
           }}
           fullWidth={true}
         />
         <TextField
-          error={errorEmail}
-          helperText={errorEmail}
+          error={beenSubmitted ? error.email : null}
+          helperText={beenSubmitted ? error.email : null}
           required
           name="email"
-          value={email}
-          onChange={handleChangeValueOfField}
+          value={form.email || ""}
+          onChange={handleInput}
           label="Email"
           margin="normal"
           InputLabelProps={{
@@ -283,39 +226,37 @@ const RegistrationForm = () => {
           }}
           fullWidth={true}
         />
-        <FormControl sx={{ marginTop: 1 }} fullWidth={true} error={errorSex}>
+        <FormControl
+          sx={{ marginTop: 1 }}
+          fullWidth={true}
+          error={beenSubmitted ? error.sexselect : null}
+        >
           <Select
-            helperText={"AAAAAA"}
             name="sexselect"
-            value={sex}
+            value={form.sexselect || ""}
             displayEmpty
-            onChange={handleChangeValueOfField}
+            onChange={handleInput}
+            className="text-field"
           >
-            <MenuItem value={"Select your Sex"} disabled>
+            <MenuItem value={""} disabled>
               <em>select the value</em>
             </MenuItem>
             <MenuItem value={"Male"}>Male</MenuItem>
             <MenuItem value={"Female"}>Female</MenuItem>
           </Select>
-          <FormHelperText>{errorSex}</FormHelperText>
+          <FormHelperText>
+            {beenSubmitted ? error.sexselect : null}
+          </FormHelperText>
         </FormControl>
-        {/* <TextField
-          error={errorAddress}
-          helperText={errorAddress}
-          required
-          name="address"
-          value={address}
-          onChange={handleChangeValueOfField}
-          label="Address"
-          margin="normal"
-          InputLabelProps={{
-            className: "text-field",
-          }}
-          fullWidth={true}
-        /> */}
         <Autocomplete
-          name="adressAutocompleter"
-          onChange={(e, v) => setAutocompleteAddress(v?.title)}
+          ref={ref0}
+          onChange={(e, v, r) => {
+            setForm((prevForm) => ({
+              ...prevForm,
+              [ref0.current.getAttribute("name")]: v?.title,
+            }));
+          }}
+          name="address"
           fullWidth={true}
           open={open}
           onOpen={() => {
@@ -330,15 +271,15 @@ const RegistrationForm = () => {
           loading={loading}
           renderInput={(params) => (
             <TextField
-              onChange={handleChangeValueOfField}
               InputLabelProps={{
                 className: "text-field",
               }}
-              error={errorAddress}
-              helperText={errorAddress}
+              onChange={handleInput}
+              error={beenSubmitted ? error.address : null}
+              helperText={beenSubmitted ? error.address : null}
               required
               name="address"
-              value={address}
+              value={form.address || ""}
               label="Address"
               margin="normal"
               {...params}
@@ -357,19 +298,25 @@ const RegistrationForm = () => {
           )}
         />
 
-        <FormControl error={errorChecked}>
+        <FormControl
+          error={beenSubmitted ? error.agreecheckbox : null}
+          className="text-field"
+        >
           <FormControlLabel
             control={
               <Checkbox
                 name="agreecheckbox"
                 color="success"
-                checked={checked}
-                onChange={handleChangeValueOfField}
+                checked={form.agreecheckbox || ""}
+                onChange={handleInput}
+                className="text-field"
               />
             }
             label="Do you agree with using your personal data?"
           />
-          <FormHelperText>{errorChecked}</FormHelperText>
+          <FormHelperText>
+            {beenSubmitted ? error.agreecheckbox : null}
+          </FormHelperText>
         </FormControl>
         <Button
           name="registerbutton"
@@ -377,7 +324,7 @@ const RegistrationForm = () => {
           InputLabelProps={{
             className: "text-field",
           }}
-          onClick={handleOnClick}
+          type="submit"
         >
           Register
         </Button>
