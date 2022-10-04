@@ -1,14 +1,13 @@
 .registration-form {
   max-width: 600px;
-
-  background: rgb(230, 230, 165);
   padding: 20px;
 }
 
 .center {
   margin: auto;
+  margin-top: 50px;
 }
 
 .text-field {
-  color: rgb(41, 28, 28) !important;
+  color: #444444 !important;
 }

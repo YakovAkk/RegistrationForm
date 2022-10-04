@@ -20,14 +20,13 @@ const RegistrationForm = () => {
   const [beenSubmitted, setBeenSubmitted] = useState(false);
   const [form, setForm] = useState({});
   const [error, setError] = useState({});
-
   const dispatch = useDispatch();
-
   const container = formContainer(dispatch);
-
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   const loading = open && options.length === 0;
+
+  const ref0 = useRef();
 
   const handleInput = (event) => {
     const { target } = event;
@@ -95,6 +94,7 @@ const RegistrationForm = () => {
 
   const zeroingvaliables = () => {
     setForm({});
+    //  MuiAutocomplete - endAdornment;
   };
 
   const zeroingerrors = () => {
@@ -162,8 +162,6 @@ const RegistrationForm = () => {
     { title: "Andorra" },
   ];
 
-  const ref0 = useRef();
-
   return (
     <div className="registration-form center">
       <Typography variant="h4" component="div" className="text-field">
@@ -227,6 +225,10 @@ const RegistrationForm = () => {
           fullWidth={true}
         />
         <FormControl
+          InputLabelProps={{
+            className: "text-field",
+          }}
+          className="text-field"
           sx={{ marginTop: 1 }}
           fullWidth={true}
           error={beenSubmitted ? error.sexselect : null}
@@ -236,19 +238,26 @@ const RegistrationForm = () => {
             value={form.sexselect || ""}
             displayEmpty
             onChange={handleInput}
-            className="text-field"
+            InputLabelProps={{
+              className: "text-field",
+            }}
           >
-            <MenuItem value={""} disabled>
+            <MenuItem className="text-field" value={""} disabled>
               <em>select the value</em>
             </MenuItem>
-            <MenuItem value={"Male"}>Male</MenuItem>
-            <MenuItem value={"Female"}>Female</MenuItem>
+            <MenuItem className="text-field" value={"Male"}>
+              Male
+            </MenuItem>
+            <MenuItem className="text-field" value={"Female"}>
+              Female
+            </MenuItem>
           </Select>
           <FormHelperText>
             {beenSubmitted ? error.sexselect : null}
           </FormHelperText>
         </FormControl>
         <Autocomplete
+          key={""}
           ref={ref0}
           onChange={(e, v, r) => {
             setForm((prevForm) => ({
