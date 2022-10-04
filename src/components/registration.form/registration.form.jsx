@@ -9,10 +9,8 @@ import FormHelperText from "@mui/material/FormHelperText";
 import FormControl from "@mui/material/FormControl";
 import "./registration.form.css";
 import { useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { actionTypes } from "../../redux/actions/action.types";
-import { types } from "../../redux/actions/types";
-import { AddUser, formContainer } from "./registration.form.container";
+import { useDispatch } from "react-redux";
+import { formContainer } from "./registration.form.container";
 import CircularProgress from "@mui/material/CircularProgress";
 import Autocomplete from "@mui/material/Autocomplete";
 
@@ -32,13 +30,11 @@ const RegistrationForm = () => {
       "key"
     )}
     `;
-    const url2 = `https://jsonplaceholder.typicode.com/todos`;
     fetch(url)
       .then((response) => response.json())
       .then((json) => {
         console.log(json);
         setOptions(json.items.map((i) => change(i.title)));
-        //setOptions(json.map((i) => change(i.title)));
       });
   };
 
@@ -269,7 +265,6 @@ const RegistrationForm = () => {
           </FormHelperText>
         </FormControl>
         <Autocomplete
-          key={""}
           ref={ref0}
           onChange={(e, v, r) => {
             setForm((prevForm) => ({
