@@ -25,8 +25,22 @@ const RegistrationForm = () => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   const loading = open && options.length === 0;
-
   const ref0 = useRef();
+
+  const getAddressesAsync = async (mess) => {
+    const url = `https://autocomplete.search.hereapi.com/v1/autocomplete?q=${mess}&apiKey=${localStorage.getItem(
+      "key"
+    )}
+    `;
+    const url2 = `https://jsonplaceholder.typicode.com/todos`;
+    fetch(url)
+      .then((response) => response.json())
+      .then((json) => {
+        console.log(json);
+        setOptions(json.items.map((i) => change(i.title)));
+        //setOptions(json.map((i) => change(i.title)));
+      });
+  };
 
   const handleInput = (event) => {
     const { target } = event;
@@ -44,6 +58,16 @@ const RegistrationForm = () => {
       }
       return;
     }
+    if (target.name == "address") {
+      (async () => {
+        await getAddressesAsync(value);
+      })();
+
+      setForm((prevForm) => ({
+        ...prevForm,
+        [target.name]: value,
+      }));
+    }
     setForm((prevForm) => ({
       ...prevForm,
       [target.name]: value,
@@ -52,18 +76,6 @@ const RegistrationForm = () => {
 
   const change = (title) => {
     return { title: title };
-  };
-  const getAddressesAsync = async (mess) => {
-    const url = `https://autocomplete.search.hereapi.com/v1/autocomplete?q=${mess}&apiKey=${localStorage.getItem(
-      "key"
-    )}
-    `;
-    const url2 = `https://jsonplaceholder.typicode.com/todos`;
-    fetch(url2)
-      .then((response) => response.json())
-      .then((json) => {
-        setOptions(json.map((i) => change(i.title)));
-      });
   };
 
   useEffect(() => {
@@ -80,7 +92,6 @@ const RegistrationForm = () => {
     }
 
     setOptions([...countries]);
-
     return () => {
       active = false;
     };
@@ -94,7 +105,7 @@ const RegistrationForm = () => {
 
   const zeroingvaliables = () => {
     setForm({});
-    //  MuiAutocomplete - endAdornment;
+    ref0.current.getElementsByTagName("button")[0].click();
   };
 
   const zeroingerrors = () => {
@@ -137,6 +148,7 @@ const RegistrationForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
     setBeenSubmitted(true);
 
     if (Object.keys(error).length === 0) {
