@@ -7,7 +7,7 @@ const defaultState = {
 export const AddressReducer = (state = defaultState, action) => {
   switch (action.type) {
     case types.ADD_SUGGESTIONS_ADDRSSES:
-      return { ...state, addresses: [...state.addresses, action.payload] };
+      return { ...state, addresses: [...action.payload] };
     default:
       return state;
   }

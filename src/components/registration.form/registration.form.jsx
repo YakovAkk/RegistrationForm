@@ -9,7 +9,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import FormControl from "@mui/material/FormControl";
 import "./registration.form.css";
 import { useEffect, useState, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { formContainer } from "./registration.form.container";
 import CircularProgress from "@mui/material/CircularProgress";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -25,6 +25,8 @@ const RegistrationForm = () => {
   const loading = open && options.length === 0;
   const ref0 = useRef();
 
+  const suggestions = useSelector((state) => state.addressReducer.addresses);
+
   const getAddressesAsync = async (mess) => {
     const url = `https://autocomplete.search.hereapi.com/v1/autocomplete?q=${mess}&apiKey=${localStorage.getItem(
       "key"
@@ -34,10 +36,19 @@ const RegistrationForm = () => {
       .then((response) => response.json())
       .then((json) => {
         console.log(json);
-        setOptions(json.items.map((i) => change(i.title)));
+        const result = json.items.map((i) => change(i.title));
+        container.AddAddresses(result);
+        setOptions([...result]);
       });
   };
 
+  const isHasMessage = (mess) => {
+    const res = suggestions.filter((elem) => {
+      return elem.title.includes(mess);
+    });
+
+    return res.length > 0;
+  };
   const handleInput = (event) => {
     const { target } = event;
 
@@ -55,9 +66,13 @@ const RegistrationForm = () => {
       return;
     }
     if (target.name == "address") {
-      (async () => {
-        await getAddressesAsync(value);
-      })();
+      if (!isHasMessage(value)) {
+        (async () => {
+          await getAddressesAsync(value);
+        })();
+      } else {
+        setOptions([...suggestions]);
+      }
 
       setForm((prevForm) => ({
         ...prevForm,
@@ -74,17 +89,17 @@ const RegistrationForm = () => {
     return { title: title };
   };
 
+  const hasTheMess = (mess) => {
+    suggestions.foreach((elem) => {
+      console.log(elem);
+    });
+  };
+
   useEffect(() => {
     let active = true;
 
     if (!loading) {
       return undefined;
-    }
-
-    if (form.address) {
-      (async () => {
-        await getAddressesAsync(form.address);
-      })();
     }
 
     setOptions([...countries]);
